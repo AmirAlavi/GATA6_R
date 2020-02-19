@@ -1,13 +1,14 @@
 #Seurat tSNE Code for GATA6 Project
 
-setwd('C:/Users/Josh/SKMO Dropbox/Joshua Hislop/GATA6 Embryogenesis Project/From JH/Single Cell')
-options("BioC_mirror")
-install.packages('Seurat')
+# setwd('C:/Users/Josh/SKMO Dropbox/Joshua Hislop/GATA6 Embryogenesis Project/From JH/Single Cell')
+# options("BioC_mirror")
+# install.packages('Seurat')
 library(Seurat)
 library(dplyr)
 library(Matrix)
 
-mmB_D5.data = Read10X(data.dir = "Single Cell/Old mmB Data/", gene.column = 2) #Gene column 2 is symbols; setting this number to 1 results in ensembl IDs
+# mmB_D5.data = Read10X(data.dir = "Single Cell/Old mmB Data/", gene.column = 2) #Gene column 2 is symbols; setting this number to 1 results in ensembl IDs
+mmB_D5.data = Read10X(data.dir = "mmB D5 Data/", gene.column = 2)
 mmB_D5 = CreateSeuratObject(counts = mmB_D5.data, min.cells = 5, min.features = 200, project = "10X_mmB_D5")
 
 # Annotate the cell list based on percentage of mitochondrial genes expressed. 
@@ -51,8 +52,10 @@ mmB_D5 <- RunPCA(object = mmB_D5, features = VariableFeatures(object = mmB_D5))
 
 ElbowPlot(object = mmB_D5)
 mmB_D5 <- JackStraw(object = mmB_D5, num.replicate = 100)
-mmB_D5 <- ScoreJackStraw(object = mmB_D5, dims = 1:30)
-JackStrawPlot(object = mmB_D5, dims = 1:30)
+#mmB_D5 <- ScoreJackStraw(object = mmB_D5, dims = 1:30)
+mmB_D5 <- ScoreJackStraw(object = mmB_D5, dims = 1:20)
+#JackStrawPlot(object = mmB_D5, dims = 1:30)
+JackStrawPlot(object = mmB_D5, dims = 1:20)
 
 mmB_D5 <- FindNeighbors(object = mmB_D5, dims = 1:14)
 mmB_D5 <- FindClusters(object = mmB_D5, resolution = 0.5)
