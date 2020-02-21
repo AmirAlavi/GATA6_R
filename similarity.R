@@ -18,6 +18,12 @@ similarityJaccard <- function(a, b, background, verbose = FALSE){
   
   intersect_ab <- intersect(a, b)
   union_ab <- union(a, b)
+  if (verbose) {
+    print(paste("\t(similarityJaccard) intersect:", length(intersect_ab)))
+    print(paste("\t(similarityJaccard) intersect:", intersect_ab))
+    print(paste("\t(similarityJaccard) union:", length(union_ab)))
+  }
+  
   length(intersect_ab) / length(union_ab)
 }
 

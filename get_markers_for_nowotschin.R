@@ -1,4 +1,5 @@
 library(Seurat)
+library(dplyr)
 
 e6.5 <- readRDS("nowotschin_data/nowotschin_E6.5_filtered_seurat_object.RDS")
 
