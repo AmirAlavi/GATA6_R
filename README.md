@@ -8,6 +8,7 @@ Large data files not included in this repo and must be obtained seperately and p
 ```
  .
  ├── alignment.R                                               # Work in progress, align using Seurat integration across species
+ ├── create_nowotschin_seurat_object.R
  ├── data
  │   ├── GATA6_D5 
 *│   │   ├── GATA6-mmB-Clustering 7-18.RData                   # Place this here
@@ -25,10 +26,9 @@ Large data files not included in this repo and must be obtained seperately and p
  │       ├── README.md
  │       ├── sc_endoderm_all_cells_counts.csv                  # Download from Nowotschin et al web server
  │       └── sc_endoderm_all_cells_metadata.csv                # Download from Nowotschin et al web server
+ ├── find_nowotschin_E6.5_markers.R
  ├── GATA6_Project_tSNE_R_Code.R                               # Joshua's original script
- ├── get_markers_for_nowotschin.R
  ├── get_marker_similarities.R
- ├── nowotschin_2_seurat.R
  ├── README.md
  ├── similarity.R
  ├── subcluster.R
@@ -36,6 +36,7 @@ Large data files not included in this repo and must be obtained seperately and p
 ```
 
 # General order of scripts to run
-- `nowotschin_2_seurat.R` (if you don't already have `nowotschin_E6.5_seurat_object.RDS`)
-- `get_marker_similarities.R`
+- `create_nowotschin_seurat_object.R` (if you don't already have `nowotschin_E6.5_seurat_object.RDS`)
+- `find_nowotschin_E6.5_markers.R`
+- `get_marker_similarities.R` (Makes all the plots, the heart of the analysis)
 - `subcluster.R`
