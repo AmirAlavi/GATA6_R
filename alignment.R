@@ -126,8 +126,8 @@ species.integrated$ProjectedCellType <- preds
 
 plot.data <- species.integrated@meta.data[species.integrated@meta.data$species == "human" ,]
 g <- ggplot(plot.data, aes(x = CellType, fill = ProjectedCellType))
-g <- g + geom_bar()
-g <- g + labs(x = "Human Cluster", fill = "Projected Mouse Cell Type") + ggtitle("Projected Mouse Cell Types for each Human Cluster", "(via KNN classifer after integration)")
+g <- g + geom_bar(position = "fill")
+g <- g + labs(x = "Human Cluster", y = "Portion of Classifications", fill = "Projected Mouse Cell Type") + ggtitle("Projected Mouse Cell Types for each Human Cluster", "(via KNN classifer after integration)")
 g
 
 saveRDS(species.integrated, file = "data/integrated_human_and_mouseE6.5.RDS")
