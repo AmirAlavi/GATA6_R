@@ -56,6 +56,18 @@ loadNowotschinE7.5Markers <- function() {
   markerDF2ListHelper(markers)
 }
 
+loadNHPMarkers <- function() {
+  markers <- read.csv("data/NHP/aax7890-Ma-SM-Table-S6.csv", colClasses = "character", row.names = 1)
+  n_clusters <- length(unique(markers$cluster))
+  markers_list <- vector(mode = "list", length = n_clusters)
+  names(markers_list) <- unique(markers$cluster)
+  for (i in 1:length(markers_list)) {
+    cur_cluster <- names(markers_list)[i]
+    markers_list[[i]] <- markers$gene[markers$cluster == cur_cluster]
+  }
+  return(markers_list)
+}
+
 
 # get all possible human genes from our GATA6 experiment:
 load("data/GATA6_D5/GATA6-mmB-Clustering 7-18.RData")
@@ -112,3 +124,11 @@ compareMarkersWithinDataset(nowotschin_E6.5_markers)
 compareMarkersWithinDataset(nowotschin_E6.5_markers_disjoint)
 
 # TODO: read in markers from Sala et al.
+
+# NHP data
+NHP_markers <- loadNHPMarkers()
+NHP_counts <- read.csv('data/NHP/Counts Matrix - GSE130114_MF1453.csv', row.names = 1)
+backgroundNHP <- intersect(GATA6_all_genes, row.names(NHP_counts))
+
+g <- compareMarkersBetweenDatasets(GATA6_markers, NHP_markers, backgroundNHP, "GATA6_cluster", "NHP_cluster")
+g + labs(x = "NHP Cell Type", y = "-log10(Hyperg Pval)")
