@@ -68,6 +68,11 @@ loadNHPMarkers <- function() {
   return(markers_list)
 }
 
+loadSalaMarkers <- function() {
+  markers <- read.csv("data/Sala_et_al/Sala_markers.csv", colClasses = "character")
+  markerDF2ListHelper(markers)
+}
+
 
 # get all possible human genes from our GATA6 experiment:
 load("data/GATA6_D5/GATA6-mmB-Clustering 7-18.RData")
@@ -123,7 +128,14 @@ compareMarkersWithinDataset(GATA6_markers)
 compareMarkersWithinDataset(nowotschin_E6.5_markers)
 compareMarkersWithinDataset(nowotschin_E6.5_markers_disjoint)
 
-# TODO: read in markers from Sala et al.
+# Sala et al.
+sala_all_genes <- read.csv("data/Sala_et_al/genes.tsv", header = FALSE, sep = "\t", colClasses = "character", col.names = c("Ensembl", "Symbol"))$Symbol
+# create background set in terms of human genes (HGNC)
+sala_human_orthologs <- convertMouseGeneList(sala_all_genes)
+backgroundSala <- intersect(GATA6_all_genes, sala_human_orthologs)
+sala_markers <- loadSalaMarkers()
+g <- compareMarkersBetweenDatasets(GATA6_markers, sala_markers, backgroundSala, "GATA6_cluster", "Sala_celltype")
+g + labs(x = "Sala Cell Type", y = "-log10(Hyperg Pval)")
 
 # NHP data
 NHP_markers <- loadNHPMarkers()
