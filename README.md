@@ -7,7 +7,6 @@ Large data files not included in this repo and must be obtained seperately and p
 
 ```
  .
- ├── alignment.R                                               # Work in progress, align using Seurat integration across species
  ├── create_nowotschin_seurat_object.R
  ├── data
  │   ├── GATA6_D5 
@@ -29,6 +28,7 @@ Large data files not included in this repo and must be obtained seperately and p
  ├── find_nowotschin_E6.5_markers.R
  ├── GATA6_Project_tSNE_R_Code.R                               # Joshua's original script
  ├── get_marker_similarities.R
+ ├── integrate_mouse_human.R                                   # Integrate mouse endoderm data with our human data and project labels
  ├── README.md
  ├── similarity.R
  ├── subcluster.R
