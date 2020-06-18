@@ -92,7 +92,7 @@ rm(s.genes)
 rm(g2m.genes)
 
 # get all possible mouse genes from the mouse endoderm explorer
-nowotschin <- readRDS("nowotschin_data/nowotschin_E6.5_filtered_seurat_object.RDS")
+nowotschin <- readRDS("data/Nowotschin_et_al/nowotschin_E6.5_seurat_object_processed.RDS")
 nowotschin_all_genes <- row.names(nowotschin)
 rm(nowotschin)
 
