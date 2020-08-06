@@ -73,6 +73,12 @@ loadSalaMarkers <- function() {
   markerDF2ListHelper(markers)
 }
 
+loadXiangMarkers <- function() {
+  markers <- read.csv("data/Xiang_et_al_counts/Xiang_markers.csv", colClasses = "character")
+  markers_list <- as.list(markers)
+  return(markers_list)
+}
+
 
 # get all possible human genes from our GATA6 experiment:
 load("data/GATA6_D5/GATA6-mmB-Clustering 7-18.RData")
@@ -127,6 +133,17 @@ g + labs(x = "Nowotschin E7.5 Cell Type", y = "-log10(Hyperg Pval)")
 compareMarkersWithinDataset(GATA6_markers)
 compareMarkersWithinDataset(nowotschin_E6.5_markers)
 compareMarkersWithinDataset(nowotschin_E6.5_markers_disjoint)
+
+# Xiang et al.
+xiang <- readRDS("data/Xiang_et_al_counts/Xiang_counts_seurat_object.RDS")
+xiang_all_genes <-row.names(xiang)
+background <- intersect(GATA6_all_genes, xiang_all_genes)
+
+xiang_markers <- loadXiangMarkers()
+
+g <- compareMarkersBetweenDatasets(GATA6_markers, xiang_markers, background, "GATA6_cluster", "Xiang_cluster")
+g + labs(x = "Xiang et al. cluster", y = "-log10(Hyperg Pval)")
+
 
 # Sala et al.
 sala_all_genes <- read.csv("data/Sala_et_al/genes.tsv", header = FALSE, sep = "\t", colClasses = "character", col.names = c("Ensembl", "Symbol"))$Symbol
