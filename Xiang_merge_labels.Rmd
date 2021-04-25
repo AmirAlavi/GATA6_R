@@ -1,0 +1,148 @@
+---
+title: "Xiang_merge_labels"
+author: "Amir Alavi"
+date: "4/21/2021"
+output: html_document
+---
+
+# Libraries
+```{r message = FALSE, warning = FALSE}
+library(Seurat)
+library(ggplot2)
+library(cowplot)
+library(patchwork)
+library(Matrix)
+library(stringr)
+library(scales)
+library(RColorBrewer)
+```
+
+```{r}
+xiang <- readRDS("data/Xiang_et_al_counts/Xiang_counts_seurat_object.RDS")
+Idents(xiang) <- xiang$Cell_type
+```
+
+# Load the new Warmflash annotations
+```{r}
+new.annotations <- read.csv("data/Xiang_et_al_counts/newAnnotations.csv")
+names(new.annotations) <- c("Cell.Id", "Old.Xiang.Label", "New.Label")
+sample.names <- read.csv("data/Xiang_et_al_counts/sample_names.csv")
+sample.names <- sample.names[, c('Accession', 'Title')]
+sample.names$ID <- sapply(str_split(sample.names$Title, "_",  n = 2), `[`, 2)
+```
+
+
+# Merge the new Warmflash annotations with the old metadata
+```{r}
+old.meta <- xiang@meta.data
+old.meta$rownames <- row.names(old.meta)
+# Match Sample.Name with Accession
+old.meta <- merge(old.meta, sample.names, by.x = "Sample.Name", by.y = "Accession")
+# Now can match up the new annotations by ID
+new.meta <- merge(old.meta, new.annotations, by.x = "ID", by.y = "Cell.Id", all.x = TRUE)
+new.meta$Merged.Label <- ifelse(is.na(new.meta$New.Label), as.character(new.meta$Cell_type), as.character(new.meta$New.Label))
+# Combine synonymous labels (e.g. "STBs" and "STB")
+new.meta$Merged.Label <- replace(new.meta$Merged.Label, new.meta$Merged.Label == "STBs", "STB")
+new.meta$Merged.Label <- replace(new.meta$Merged.Label, new.meta$Merged.Label == "CTBs", "CTB")
+new.meta$Merged.Label <- replace(new.meta$Merged.Label, new.meta$Merged.Label == "EVTs", "EVT")
+new.meta$Merged.Label <- replace(new.meta$Merged.Label, new.meta$Merged.Label == "Epi", "EPI")
+rownames(new.meta) <- new.meta$rownames
+```
+
+# Also merge the label sets from Table S8 in the Xiang paper
+```{r}
+files <- list.files(path = "data/Xiang_et_al_counts/Table_S8", pattern = "*.csv", full.names = TRUE, recursive  = FALSE)
+for (f in files) {
+  cur.table <- read.csv(f, row.names = 1)
+  
+  table.name <- basename(f)
+  table.name <- gsub(table.name, pattern = ".csv", replacement = "")
+  
+  colnames(cur.table) <- paste(table.name, colnames(cur.table), sep = ".")
+  
+  new.meta <- merge(new.meta, cur.table, by.x = "ID", by.y = "row.names", all.x = TRUE)
+  rownames(new.meta) <- new.meta$rownames
+}
+```
+# Finally, add merged metadata back to Xiang SeuratObject
+```{r}
+xiang <- AddMetaData(xiang, metadata = new.meta)
+```
+
+# Subset features to common set between Ours and Xiang et al
+```{r message = FALSE, warning = FALSE}
+load("data/GATA6_D5/GATA6-mmB-Clustering 7-18.RData")
+rm(mmB_D5.data)
+rm(mmB_D5.markers)
+rm(g2m.genes)
+rm(s.genes)
+
+GATA6.genes <- row.names(mmB_D5)
+xiang.genes <- row.names(xiang)
+common <- intersect(GATA6.genes, xiang.genes)
+
+xiang <- subset(xiang, features = common)
+```
+
+# Scaling, HVG, Embedding
+```{r message = FALSE, warning = FALSE}
+xiang <- NormalizeData(xiang)
+xiang <- FindVariableFeatures(xiang)
+xiang <- ScaleData(xiang)
+
+npcs <- 30
+xiang <- RunPCA(xiang, npcs = npcs)
+ElbowPlot(xiang)
+xiang <- RunUMAP(xiang, dims = 1:npcs)
+xiang <- RunTSNE(xiang)
+```
+# Visualization
+## Create a unified color palette (just for the old vs new warmflash labels)
+```{r}
+xiang$Merged.Label <- as.factor(xiang$Merged.Label)
+xiang$Cell_type <- as.character(xiang$Cell_type)
+xiang$Cell_type <- replace(xiang$Cell_type, xiang$Cell_type == "STBs", "STB")
+xiang$Cell_type <- replace(xiang$Cell_type, xiang$Cell_type == "CTBs", "CTB")
+xiang$Cell_type <- replace(xiang$Cell_type, xiang$Cell_type == "EVTs", "EVT")
+xiang$Cell_type <- as.factor(xiang$Cell_type)
+
+
+# Unify the factor levels across both cell type label columns
+xiang$Cell_type <- factor(xiang$Cell_type, levels = union(levels(xiang$Cell_type), levels(xiang$Merged.Label)))
+xiang$Merged.Label <- factor(xiang$Merged.Label, levels = union(levels(xiang$Cell_type), levels(xiang$Merged.Label)))
+
+
+all.labels = levels(xiang@meta.data$Cell_type)
+color.palette <- brewer.pal(length(all.labels), "Set3")
+names(color.palette) <- all.labels
+```
+
+## Confirm that most cells are same
+```{r out.width = "100%"}
+common_subset = xiang[, xiang$Cell_type == xiang$Merged.Label]
+p1 <- DimPlot(common_subset, reduction = "umap", group.by = "Cell_type", label = TRUE, cols = color.palette) + theme_dark() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + NoLegend()
+p2 <- DimPlot(common_subset, reduction = "umap", group.by = "Merged.Label", cols= color.palette) + theme_dark() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+p1 + p2
+```
+
+## Plot only the differently labeled cells
+```{r out.width = "100%"}
+diff_subset = xiang[, xiang$Cell_type != xiang$Merged.Label]
+p1 <- DimPlot(diff_subset, reduction = "umap", group.by = "Cell_type", label = TRUE, cols = color.palette) + theme_dark() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + NoLegend()
+p2 <- DimPlot(diff_subset, reduction = "umap", group.by = "Merged.Label", cols= color.palette) + theme_dark() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+p1 + p2
+```
+
+## All together
+```{r out.width = "100%"}
+p1 <- DimPlot(xiang, reduction = "umap", group.by = "Cell_type", label = TRUE, cols = color.palette) + theme_dark() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) + NoLegend()
+p2 <- DimPlot(xiang, reduction = "umap", group.by = "Merged.Label", cols= color.palette) + theme_dark() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+p1 + p2
+```
+
+```{r}
+merged.label.table <- xiang@meta.data[c("ID", "Cell_type", "Merged.Label", "S8.1.Group", "S8.3.Group", "S8.5.Group", "S8.6.1.Group", "S8.6.2.Group")]
+write.csv(merged.label.table, "Xiang_merged_label_table.csv")
+saveRDS(xiang, "Xiang_merged_labels.RDS")
+```
+

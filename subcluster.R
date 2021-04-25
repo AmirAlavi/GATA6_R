@@ -1,6 +1,6 @@
 library(Seurat)
 library(plyr)
-load("joshua_workspace_data/GATA6-mmB-Clustering 7-18.RData")
+load("data/GATA6_D5/GATA6-mmB-Clustering 7-18.RData")
 DimPlot(object = mmB_D5, reduction = "tsne")
 
 # Focus on cluster 3
@@ -36,3 +36,4 @@ subcluster3.2.markers <- FindMarkers(mmB_D5, ident.1 = 3.2, only.pos = TRUE, min
 subcluster3.2.markers.sig <- subcluster3.2.markers[subcluster3.2.markers$p_val_adj < 0.05, ]
 dim(subcluster3.2.markers.sig)
 head(subcluster3.2.markers.sig, n = 10)
+
