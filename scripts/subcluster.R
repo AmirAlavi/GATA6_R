@@ -1,6 +1,6 @@
 library(Seurat)
 library(plyr)
-load("data/GATA6_D5/GATA6-mmB-Clustering 7-18.RData")
+load(snakemake@input[[1]])
 DimPlot(object = mmB_D5, reduction = "tsne")
 
 # Focus on cluster 3
@@ -24,7 +24,9 @@ combined_idents <- Idents(mmB_D5)
 levels(combined_idents) <- c(levels(combined_idents), levels(subcluster_idents))
 combined_idents[attr(subcluster_idents, "names")] <- subcluster_idents
 Idents(mmB_D5) <- combined_idents
+mmB_D5$subclusters <- combined_idents
 DimPlot(object = mmB_D5, reduction = "tsne")
+saveRDS(mmB_D5, file = snakemake@output[[1]])
 
 # Find markers for the new subclusters
 subcluster3.1.markers <- FindMarkers(mmB_D5, ident.1 = 3.1, only.pos = TRUE, min.pct = 0.25)

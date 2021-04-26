@@ -1,8 +1,8 @@
 library(Seurat)
 library(dplyr)
-source("utils.R")
+source("scripts/utils.R")
 
-e6.5 <- readRDS("data/Nowotschin_et_al/nowotschin_E6.5_seurat_object.RDS")
+e6.5 <- readRDS(snakemake@input[[1]])
 
 # Annotate the cell list based on percentage of mitochondrial genes expressed. 
 e6.5[["percent.mt"]] <- PercentageFeatureSet(object = e6.5, pattern = "^mt-")
@@ -37,7 +37,7 @@ g2m.genes <- cc.genes$g2m.genes
 m.s.genes <- convertHumanGeneList(s.genes)
 m.g2m.genes <- convertHumanGeneList(g2m.genes)
 
-
+# This regression is very expensive to run...
 e6.5 <- CellCycleScoring(object = e6.5, s.features = m.s.genes, g2m.features = m.g2m.genes, set.ident = TRUE)
 e6.5 <- ScaleData(object = e6.5, vars.to.regress = c("S.Score", "G2M.Score"), features = rownames(x = e6.5))
 
@@ -54,6 +54,6 @@ Idents(e6.5) <- e6.5@meta.data$CellType
 DimPlot(object = e6.5, reduction = "tsne")
 
 e6.5.markers <- FindAllMarkers(object = e6.5, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
-e6.5.markers %>% group_by(cluster) %>% top_n(n = 10, wt = avg_logFC)
-saveRDS(e6.5.markers, file = "data/Nowotschin_et_al/E6.5_markers.RDS")
-saveRDS(e6.5, file = "data/Nowotschin_et_al/nowotschin_E6.5_seurat_object_processed.RDS")
+e6.5.markers %>% group_by(cluster) %>% top_n(n = 10, wt = avg_log2FC)
+saveRDS(e6.5.markers, file = snakemake@output[[1]])
+saveRDS(e6.5, file = snakemake@output[[2]])

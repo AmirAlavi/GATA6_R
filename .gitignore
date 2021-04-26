@@ -2,6 +2,9 @@
 **.pdf
 **.zip
 packrat/lib*/
+results
+remote_data
+.snakemake
 
 # History files
 .Rhistory
