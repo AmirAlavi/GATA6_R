@@ -33,6 +33,19 @@ loadXiangMarkers <- function() {
   return(markers_list)
 }
 
+loadXiangNewMarkers <- function() {
+  markers <- readRDS(snakemake@input[[5]])
+  n_clusters <- length(unique(markers$cluster))
+  markers_list <- vector(mode = "list", length = n_clusters)
+  names(markers_list) <- unique(markers$cluster)
+  for (i in 1:length(markers_list)) {
+    cur_cluster <- names(markers_list)[i]
+    cur_markers <- markers$gene[markers$cluster == cur_cluster]
+    markers_list[[i]] <- cur_markers
+  }
+  return(markers_list)
+}
+
 # get all possible human genes from our GATA6 experiment:
 mmB_D5 <- readRDS(snakemake@input[[1]])
 GATA6_all_genes <- row.names(mmB_D5)
@@ -79,3 +92,14 @@ both_markers <- c(xiang_markers, tyser_markers)
 g <- compareMarkersBetweenDatasets(GATA6_markers, both_markers, background, "GATA6_cluster", "Xiang_Tyser_cluster")
 g + labs(x = "Xiang et al./Tyser et al. cluster", y = "-log10(Hyperg Pval)")
 ggsave(snakemake@output[[3]])
+
+# New Xiang et al. annotations (accounting for Warmflash et al. corrections)
+xiang <- readRDS(snakemake@input[[6]])
+xiang_all_genes <- row.names(xiang)
+background <- intersect(GATA6_all_genes, xiang_all_genes)
+
+xiang_markers <- loadXiangNewMarkers()
+
+g <- compareMarkersBetweenDatasets(GATA6_markers, xiang_markers, background, "GATA6_cluster", "new_Xiang_cluster")
+g + labs(x = "(new) Xiang et al. cluster", y = "-log10(Hyperg Pval)")
+ggsave(snakemake@output[[4]])

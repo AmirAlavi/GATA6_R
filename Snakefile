@@ -22,6 +22,7 @@ GDRIVE_URLS = {
     "Tyser_metadata": "https://drive.google.com/uc?id=1N0Ap1KFElx-IDhqIwBTY8kkh2QI4gRIl",
     "Ma_counts": "https://drive.google.com/uc?id=1xbiuxtumjD9t_OG-Dd7toxRt6g5e5Ub5",
     "Ma_markers": "https://drive.google.com/uc?id=1KGuC9uMRgZQAvtXDnll7HzSnPZaS-oi2", 
+    "Sala_gene_list": "https://drive.google.com/uc?id=1fIq8MzTsFln0l87S-8GXZEuqjvjNZc54",
 }
 
 
@@ -38,8 +39,10 @@ rule all:
         "results/figures/hypergeometric_comparisons/Tyser.png",
         "results/figures/hypergeometric_comparisons/Xiang.png",
         "results/figures/hypergeometric_comparisons/Tyser_and_Xiang.png",
+        "results/figures/hypergeometric_comparisons/Xiang_new_annotations.png",
         "results/figures/hypergeometric_comparisons/Sala.png",
         "results/figures/hypergeometric_comparisons/Ma.png",
+        "results/figures/marker_module_scoring/Xiang_new_annotations.png",
 
 ###############################################################################
 # Data downloading and marker finding
@@ -109,6 +112,18 @@ rule create_xiang_seurat_object:
     script:
         "scripts/create_xiang_seurat_object_counts.R"
 
+rule create_xiang_new_annotations_marker_lists:
+    input:
+        "results/R_objects/Xiang_seurat_object.RDS",
+        "data/Xiang_et_al_counts/Xiang_merged_label_table_analysisColumn.csv"
+    output:
+        "results/R_objects/Xiang_new_annotations_markers.RDS",
+        "results/R_objects/Xiang_new_annotations_processed_seurat_object.RDS"
+    conda:
+        "envs/r_seurat_env.yml"
+    script:
+        "scripts/find_xiang_new_annotation_markers.R"
+
 rule download_tyser_data:
     output:
         counts="remote_data/Tyser_et_al/express_vals.rds",
@@ -137,7 +152,16 @@ rule download_ma_data:
         gdown.download(GDRIVE_URLS["Ma_counts"], output.counts)
         gdown.download(GDRIVE_URLS["Ma_markers"], output.markers)
 
+
+rule download_sala_gene_list:
+    output:
+        "data/Sala_et_al/genes.tsv.gz"
+    run:
+        gdown.download(GDRIVE_URLS["Sala_gene_list"], output[0])
+
 rule extract_sala_gene_list:
+    input:
+        "data/Sala_et_al/genes.tsv.gz"
     output:
         "data/Sala_et_al/genes.tsv"
     shell:
@@ -170,11 +194,14 @@ rule compare_to_tyser_and_xiang:
         "results/R_objects/Ours_subclusters_seurat_object.RDS",
         "results/R_objects/Tyser_markers.RDS",
         "results/R_objects/Tyser_seurat_object_processed.RDS",
-        "results/R_objects/Xiang_seurat_object.RDS"
+        "results/R_objects/Xiang_seurat_object.RDS",
+        "results/R_objects/Xiang_new_annotations_markers.RDS",
+        "results/R_objects/Xiang_new_annotations_processed_seurat_object.RDS"
     output:
         "results/figures/hypergeometric_comparisons/Tyser.png",
         "results/figures/hypergeometric_comparisons/Xiang.png",
         "results/figures/hypergeometric_comparisons/Tyser_and_Xiang.png",
+        "results/figures/hypergeometric_comparisons/Xiang_new_annotations.png",
     conda:
         "envs/r_seurat_env.yml"
     script:
@@ -202,3 +229,17 @@ rule compare_to_ma:
         "envs/r_seurat_env.yml"
     script:
         "scripts/hyperg_similarity_ma.R"
+
+###############################################################################
+# Marker "module score" figures
+###############################################################################
+rule create_module_score_figures:
+    input:
+        "results/R_objects/Ours_subclusters_seurat_object.RDS",
+        "results/R_objects/Xiang_new_annotations_markers.RDS",
+    output:
+        "results/figures/marker_module_scoring/Xiang_new_annotations.png",
+    conda:
+        "envs/r_seurat_env.yml"
+    script:
+        "scripts/module_score_figures.R"
