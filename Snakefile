@@ -43,6 +43,8 @@ rule all:
         "results/figures/hypergeometric_comparisons/Sala.png",
         "results/figures/hypergeometric_comparisons/Ma.png",
         "results/figures/marker_module_scoring/Xiang_new_annotations.png",
+        "results/figures/data_integration_and_alignment/Ours_onto_Tyser_UMAP.png",
+        "results/figures/data_integration_and_alignment/Ours_onto_Tyser_transfer_label_distribution.png"
 
 ###############################################################################
 # Data downloading and marker finding
@@ -243,3 +245,20 @@ rule create_module_score_figures:
         "envs/r_seurat_env.yml"
     script:
         "scripts/module_score_figures.R"
+
+###############################################################################
+# Data integration and alignment figures
+###############################################################################
+rule integrate_and_align_tyser:
+    input:
+        "results/R_objects/Ours_subclusters_seurat_object.RDS",
+        # "results/R_objects/Tyser_markers.RDS",
+        "remote_data/Tyser_et_al/express_vals.rds",
+        "remote_data/Tyser_et_al/umap.rds"
+    output:
+        "results/figures/data_integration_and_alignment/Ours_onto_Tyser_UMAP.png",
+        "results/figures/data_integration_and_alignment/Ours_onto_Tyser_transfer_label_distribution.png"
+    conda:
+        "envs/r_seurat_env.yml"
+    script:
+        "scripts/alignment_tyser.R"
