@@ -99,9 +99,6 @@ p2 <- DimPlot(combined, reduction = reduction, label = FALSE, cols = pal) + ggti
 # Color by transfered cell types
 p3 <- DimPlot(combined, reduction = reduction, group.by = "Cell_type", label = FALSE, cols = pal) + ggtitle("Transfered Cell type")# + NoLegend()
 
-print(combined$Cell_type)
-print(pal)
-
 patchwork <- (p1 + p2 + p3)
 patchwork <- patchwork + plot_annotation(
   title = "Transfer Tyser et al. Annotations onto GATA6 Data",

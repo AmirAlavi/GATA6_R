@@ -16,12 +16,12 @@ loadXiangNewMarkers <- function() {
   return(markers_list)
 }
 
-PlotModuleScores <- function(obj, markers) {
+PlotModuleScores <- function(obj, markers, reduction = "umap") {
   for (cell.type in names(markers)) {
     obj <- AddModuleScore(obj, features = markers[cell.type], name = cell.type, search = TRUE)
     names(obj@meta.data)[names(obj@meta.data) == paste0(cell.type, "1")] <- paste0(cell.type, ".score")
   }
-  FeaturePlot(obj, reduction = "tsne", features = paste0(names(markers), ".score"), combine = FALSE)
+  FeaturePlot(obj, reduction = reduction, features = paste0(names(markers), ".score"), combine = FALSE)
 }
 
 new_xiang_markers <- loadXiangNewMarkers()
@@ -40,5 +40,8 @@ n.unused.colors <- length(pal) - length(all.ids)
 all.ids <- c(all.ids, rep("none", n.unused.colors))
 names(pal) <- all.ids
 
-DimPlot(mmB_D5, reduction="tsne", cols = pal) + PlotModuleScores(mmB_D5, new_xiang_markers) + plot_annotation(title = "New Xiang Cell type scores")
+DimPlot(mmB_D5, reduction="tsne", cols = pal) + PlotModuleScores(mmB_D5, new_xiang_markers, reduction = "tsne") + plot_annotation(title = "New Xiang Cell type scores")
 ggsave(snakemake@output[[1]], scale = 2)
+DimPlot(mmB_D5, cols = pal) + PlotModuleScores(mmB_D5, new_xiang_markers) + plot_annotation(title = "New Xiang Cell type scores")
+ggsave(snakemake@output[[2]], scale = 2)
+

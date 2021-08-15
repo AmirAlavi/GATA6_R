@@ -75,15 +75,15 @@ nowotschin_E7.5_markers <- loadNowotschinE7.5Markers()
 
 g <- compareMarkersBetweenDatasets(GATA6_markers, nowotschin_E4.5_markers, background, "GATA6_cluster", "Nowotschin_E4.5_celltype")
 g + labs(x = "Nowotschin E4.5 Cell Type", y = "-log10(Hyperg Pval)")
-ggsave(snakemake@output[[1]])
+ggsave(snakemake@output[[1]], width = 10, height = 5, units = "in")
 
 g <- compareMarkersBetweenDatasets(GATA6_markers, nowotschin_E5.5_markers, background, "GATA6_cluster", "Nowotschin_E5.5_celltype")
 g + labs(x = "Nowotschin E5.5 Cell Type", y = "-log10(Hyperg Pval)")
-ggsave(snakemake@output[[2]])
+ggsave(snakemake@output[[2]], width = 10, height = 5, units = "in")
 
 g <- compareMarkersBetweenDatasets(GATA6_markers, nowotschin_E6.5_markers, background, "GATA6_cluster", "Nowotschin_E6.5_celltype")
 g + labs(x = "Nowotschin E6.5 Cell Type", y = "-log10(Hyperg Pval)")
-ggsave(snakemake@output[[3]])
+ggsave(snakemake@output[[3]], width = 10, height = 5, units = "in")
 
 # Take in a marker list and make all of the marker sets in it disjoint wrt each other
 makeMarkersDisjoint <- function(x) {
@@ -107,11 +107,11 @@ makeMarkersDisjoint <- function(x) {
 nowotschin_E6.5_markers_disjoint <- makeMarkersDisjoint(nowotschin_E6.5_markers)
 g <- compareMarkersBetweenDatasets(GATA6_markers, nowotschin_E6.5_markers_disjoint, background, "GATA6_cluster", "Nowotschin_E6.5_celltype")
 g + labs(x = "Nowotschin E6.5 Cell Type", y = "-log10(Hyperg Pval)")
-ggsave(snakemake@output[[4]])
+ggsave(snakemake@output[[4]], width = 10, height = 5, units = "in")
 
 g <- compareMarkersBetweenDatasets(GATA6_markers, nowotschin_E7.5_markers, background, "GATA6_cluster", "Nowotschin_E7.5_celltype")
 g + labs(x = "Nowotschin E7.5 Cell Type", y = "-log10(Hyperg Pval)")
-ggsave(snakemake@output[[5]])
+ggsave(snakemake@output[[5]], width = 10, height = 5, units = "in")
 
 compareMarkersWithinDataset(GATA6_markers)
 ggsave(snakemake@output[[6]])

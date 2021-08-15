@@ -90,3 +90,18 @@ convertHumanGeneList <- function(x, verbose = FALSE) {
   }
   return(mousex)
 }
+
+
+# Consistent Color Palette
+shifter <- function(x, n = 1) {
+  if (n == 0) x else c(tail(x, -n), head(x, n))
+}
+
+getColorPalette <- function(idents, shift = 9) {
+  pal <- DiscretePalette(26, "alphabet2")
+  pal <- shifter(pal, 9)
+  n.unused.colors <- length(pal) - length(idents)
+  idents <- c(idents, rep("none", n.unused.colors))
+  names(pal) <- idents
+  return(pal)
+}

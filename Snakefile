@@ -42,7 +42,8 @@ rule all:
         "results/figures/hypergeometric_comparisons/Xiang_new_annotations.png",
         "results/figures/hypergeometric_comparisons/Sala.png",
         "results/figures/hypergeometric_comparisons/Ma.png",
-        "results/figures/marker_module_scoring/Xiang_new_annotations.png",
+        "results/figures/marker_module_scoring/Xiang_new_annotations_TSNE.png",
+        "results/figures/marker_module_scoring/Xiang_new_annotations_UMAP.png",
         "results/figures/data_integration_and_alignment/Ours_onto_Tyser_UMAP.png",
         "results/figures/data_integration_and_alignment/Ours_onto_Tyser_transfer_label_distribution.png"
 
@@ -240,7 +241,8 @@ rule create_module_score_figures:
         "results/R_objects/Ours_subclusters_seurat_object.RDS",
         "results/R_objects/Xiang_new_annotations_markers.RDS",
     output:
-        "results/figures/marker_module_scoring/Xiang_new_annotations.png",
+        "results/figures/marker_module_scoring/Xiang_new_annotations_TSNE.png",
+        "results/figures/marker_module_scoring/Xiang_new_annotations_UMAP.png",
     conda:
         "envs/r_seurat_env.yml"
     script:

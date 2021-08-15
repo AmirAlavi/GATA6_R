@@ -73,7 +73,7 @@ tyser_markers <- loadTyserMarkers()
 
 g <- compareMarkersBetweenDatasets(GATA6_markers, tyser_markers, background, "GATA6_cluster", "Tyser_cluster")
 g + labs(x = "Tyser et al. cluster", y = "-log10(Hyperg Pval)")
-ggsave(snakemake@output[[1]])
+ggsave(snakemake@output[[1]], width = 10, height = 5, units = "in")
 
 # Xiang et al.
 xiang <- readRDS(snakemake@input[[4]])
@@ -84,14 +84,14 @@ xiang_markers <- loadXiangMarkers()
 
 g <- compareMarkersBetweenDatasets(GATA6_markers, xiang_markers, background, "GATA6_cluster", "Xiang_cluster")
 g + labs(x = "Xiang et al. cluster", y = "-log10(Hyperg Pval)")
-ggsave(snakemake@output[[2]])
+ggsave(snakemake@output[[2]], width = 10, height = 5, units = "in")
 
 # Tyser et al. and Xiang et al. together
 background <- Reduce(intersect, list(GATA6_all_genes, xiang_all_genes, tyser_all_genes))
 both_markers <- c(xiang_markers, tyser_markers)
 g <- compareMarkersBetweenDatasets(GATA6_markers, both_markers, background, "GATA6_cluster", "Xiang_Tyser_cluster")
 g + labs(x = "Xiang et al./Tyser et al. cluster", y = "-log10(Hyperg Pval)")
-ggsave(snakemake@output[[3]])
+ggsave(snakemake@output[[3]], width = 10, height = 5, units = "in")
 
 # New Xiang et al. annotations (accounting for Warmflash et al. corrections)
 xiang <- readRDS(snakemake@input[[6]])
@@ -102,4 +102,4 @@ xiang_markers <- loadXiangNewMarkers()
 
 g <- compareMarkersBetweenDatasets(GATA6_markers, xiang_markers, background, "GATA6_cluster", "new_Xiang_cluster")
 g + labs(x = "(new) Xiang et al. cluster", y = "-log10(Hyperg Pval)")
-ggsave(snakemake@output[[4]])
+ggsave(snakemake@output[[4]], width = 10, height = 5, units = "in")

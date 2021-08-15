@@ -26,6 +26,8 @@ combined_idents[attr(subcluster_idents, "names")] <- subcluster_idents
 Idents(mmB_D5) <- combined_idents
 mmB_D5$subclusters <- combined_idents
 DimPlot(object = mmB_D5, reduction = "tsne")
+mmB_D5 <- RunUMAP(mmB_D5, dims = 1:20)
+DimPlot(object = mmB_D5, reduction = "umap")
 saveRDS(mmB_D5, file = snakemake@output[[1]])
 
 # Find markers for the new subclusters

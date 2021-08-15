@@ -41,4 +41,4 @@ backgroundMa <- intersect(GATA6_all_genes, row.names(Ma_counts))
 
 g <- compareMarkersBetweenDatasets(GATA6_markers, Ma_markers, backgroundMa, "GATA6_cluster", "Ma_cluster")
 g + labs(x = "Ma et al. Cell Type", y = "-log10(Hyperg Pval)")
-ggsave(snakemake@output[[1]])
+ggsave(snakemake@output[[1]], width = 10, height = 5, units = "in")
