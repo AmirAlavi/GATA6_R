@@ -56,6 +56,23 @@ rule download_our_data:
     run:
         gdown.download(GDRIVE_URLS["Our_data"], output[0])
 
+rule ensure_local_data:
+    output:
+        "data/iDiscoid_Seurat_Objects/mmBmK12hr_033022_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmK_36hr_03302022_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmK_3hr_03302022_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD0D1_033022_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD0D5_033022_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD0Ri_033022_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD1_030722_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD2_033022_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD3_03302022_processed_WTsubclustered.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD4_combined_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD5_033022_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD7_processed.RData"
+    run:
+        print("\n********************\nERROR: Missing iDiscoid Seurat Objects, download them to:\n\tdata/iDiscoid_Seurat_Objects\n********************\n")
+
 rule subcluster_our_data:
     input:
         "remote_data/Ours/GATA6-mmB-Clustering 7-18.RData"
@@ -126,6 +143,39 @@ rule create_xiang_new_annotations_marker_lists:
         "envs/r_seurat_env.yml"
     script:
         "scripts/find_xiang_new_annotation_markers.R"
+
+rule create_xiang_new_annotations_marker_lists_by_day:
+    input:
+        "results/R_objects/Xiang_new_annotations_processed_seurat_object.RDS"
+    output:
+        "results/R_objects/Xiang_new_annotations_markers_by_day.RDS",
+    conda:
+        "envs/r_seurat_env.yml"
+    script:
+        "scripts/find_xiang_new_annotation_markers_by_day.R"
+
+rule assemble_our_revision_data_markers_by_day:
+    input:
+        "data/iDiscoid_Seurat_Objects/mmBmK12hr_033022_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmK_36hr_03302022_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmK_3hr_03302022_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD0D1_033022_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD0D5_033022_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD0Ri_033022_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD1_030722_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD2_033022_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD3_03302022_processed_WTsubclustered.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD4_combined_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD5_033022_processed.RData",
+        "data/iDiscoid_Seurat_Objects/mmBmKD7_processed.RData"
+    output:
+        "results/R_objects/iDiscoid_markers_by_day.RDS",
+        "results/R_objects/iDiscoid_gene_sets_by_day.RDS"
+    conda:
+        "envs/r_seurat_env.yml"
+    script:
+        "scripts/assemble_our_markers_by_day.R"
+        
 
 rule download_tyser_data:
     output:
@@ -232,6 +282,21 @@ rule compare_to_ma:
         "envs/r_seurat_env.yml"
     script:
         "scripts/hyperg_similarity_ma.R"
+
+rule revision_comparisons:
+    input:
+        "results/R_objects/Xiang_new_annotations_processed_seurat_object.RDS",
+        "results/R_objects/Xiang_new_annotations_markers_by_day.RDS",
+        "results/R_objects/iDiscoid_markers_by_day.RDS",
+        "results/R_objects/iDiscoid_gene_sets_by_day.RDS",
+        "results/R_objects/Tyser_markers.RDS",
+        "results/R_objects/Tyser_seurat_object_processed.RDS",
+    output:
+        "results/figures/hypergeometric_comparisons/revision/success.txt"
+    conda:
+        "envs/r_seurat_env.yml"
+    script:
+        "scripts/hyperg_similarity_xiang_and_tyser_revision.R"
 
 ###############################################################################
 # Marker "module score" figures
