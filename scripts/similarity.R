@@ -166,11 +166,12 @@ compareMarkersBetweenDatasets <- function(markers1, markers2, background, name_m
   names(scores)[names(scores) == "markers2"] <- name_markers2
   name_score <- "negLogPval"
   print(head(scores))
-  g <- ggplot(scores, aes_string(name_markers2, name_score, fill = name_markers1))
-  g <- g + geom_col()
-  g <- g + geom_hline(yintercept = -1 * log10(0.05))
-  pal <- getColorPalette(names(markers1))
-  g <- g + scale_fill_manual(values = pal)
-  g <- g + facet_grid(reformulate(name_markers1, "."), labeller = label_both)
-  g + theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "none")
+  #g <- ggplot(scores, aes_string(name_markers2, name_score, fill = name_markers1))
+  #g <- g + geom_col()
+  #g <- g + geom_hline(yintercept = -1 * log10(0.05))
+  #pal <- getColorPalette(names(markers1))
+  #g <- g + scale_fill_manual(values = pal)
+  #g <- g + facet_grid(reformulate(name_markers1, "."), labeller = label_both)
+  #g + theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "none")
+  return(scores)
 }

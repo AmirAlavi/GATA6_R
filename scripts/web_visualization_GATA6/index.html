@@ -1,0 +1,197 @@
+
+	<!DOCTYPE html>
+	<html lang="en">
+	  <head>
+		<meta charset="utf-8">
+
+		<title>Single Cell Data Visualization</title>
+		<!--canvg library-->
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+		<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+		<script src="parseJSON.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js"></script>
+		<script type="text/javascript" src="data.json"></script>
+		<script type="text/javascript" src="CellViz.json"></script>
+		  <script type="text/javascript" src="tfdna.json"></script>
+		
+		<script src="https://thibaultjanbeyer.github.io/DragSelect/ds.min.js"></script>
+	
+		<script src="CellCor.json"></script>
+		<script src="CellEntropy.json"></script>
+		
+	  </head>
+	  <body onload="onload()">
+		  <!-- This DIV contains static visualization configuration config-->
+		  <div id="div_config">
+			  <div class="tf">
+				<nav>
+					<div class="menu-item" id="globalconfig">
+					  <h4><a href="#">GLOBAL CONFIG</a></h4>
+					  <ul>
+						 <li>
+						   <span>Reset: <input type="submit", class="fa fa-search" onclick="resetconfig()" value="&#xf2f1;"></span><br>
+							  <input type="range" id="zoomsliderbar" value="50" min="0" max="100" onchange="zoom(this.value)"></input>
+							  <span id="zoomslider">50</span>
+							</li>
+						 <li>
+								<input type="submit" onclick="setbgcolor()" class="fa fa-search" value="&#xf53f; Set Background" title="change/set the background color the figure">
+								
+								<input type="color" id="bgcolor" value="#ffffff"> 
+							</li>
+						
+						<li>
+								<input type="submit" onclick="setnodecolor()" class ="fa fa-search" value="&#xf53f; Set Node Color" title="change/set the color of the node"> </input>
+								<input type="color" id="nodecolor" value="#a9a9a9"> 
+								
+							</li>
+							
+						<li>
+								<input type="submit" onclick="settextcolor()" class="fa fa-search" value="&#xf53f; Set Text Color" title="change/set the color of the text">
+								<input type="color" id="textcolor" value="#000000"> 
+								
+							</li>
+						
+						<li>
+								<input type="submit" onclick="setlinecolor()" class="fa fa-search" value="&#xf53f; Set Line Color" title="change/set the color of the line">
+								<input type="color" id="linecolor" value="#aaaaaa"> 
+								
+							</li>
+						<li>
+								<input type="submit" class="fa fa-search" onclick="resizecell()" value="&#xf436; Set Cell Size" title="change/set the cell size">
+								<input type="text" id="cellsize"> 
+								
+							</li>
+					  </ul>
+					</div>
+					
+					
+					<div class="menu-item"><h4><a onclick="fold('cellplot')">CELL PLOTS</a></h4></div>  
+					<div class="menu-item" id="cellplot">
+					  <ul>
+						<li>
+							<input type="submit" value="&#xf080; Plot Cells" class="fa fa-search" onclick='vizCells("viztypep")'> <br>
+							<input type="radio" name="viztype" value="tsne" id="viztypet" checked> T-SNE
+							<input type="radio" name="viztype" value="pca" id="viztypep">  PCA <br>
+							<input type="radio" name="viztype" value="dfmap" id="viztyped"> Diffusion Map
+							</li>
+						<li>
+							Color the cells by: 
+							<select id="ColorCode">
+								<option value="time"> Capture Time</option>
+								<option value="path"> Model Path</option>
+							</select>
+							</li>
+					  </ul>
+					</div>
+					
+					
+					  
+					<div class="menu-item" id="cellconfig">
+						<h4><a href="#">CELL CONFIG</a></h4>
+						<ul>
+							<li>
+							<input type="button" class="fa fa-search " value="&#xf00e;ColorCellsByGene" id="cellsubmit" onclick="ptest()">
+							<input type="text" name="cellGeneName" id="cellGeneName" value="" onkeydown="if (event.keyCode == 13) { ptest(); }"><br>
+							<input type="range" id="geneslider" value="1" min="0" max="10" step=0.1 onchange=setgeneslider(this.value)></input> &nbsp;&nbsp;&nbsp; <span id="cellGeneSlider">1</span> <br>
+							<span id="cellStatus"></span> <br>
+							<input type="button" class="fa fa-search " value="&#xf00e;Color Cells By FateBias Value from FateID" id="cellfate" onclick="showfate()"><br>
+							</li><li>
+							
+                            <input type="button" id="sbutton1" class="fa fa-search" value="&#xf03a;Set Group1 as selected" onclick="setSelect(1)"> 
+                            <input type="color" id="scolor1" value="#ffff00"> <span id="sgroup1">0</span><br>
+                            <input type="button" id="sbutton1e" class="fa fa-search" value="&#xf03a; /Select Group1 as edge:" onclick="gedgeonchange(1)"> <span id="edgeGroup1"></span> <br>
+                            
+                            <input type="button" id="sbutton2" class="fa fa-search" value="&#xf03a;Set Group2 as selected" onclick="setSelect(2)">
+                            <input type="color" id="scolor2"  value="#00ff00"> <span id="sgroup2">0</span> <br>
+                            <input type="button" id="sbutton2e" class="fa fa-search" value="&#xf03a;/Select Group2 as edge:" onclick="gedgeonchange(2)"> <span id="edgeGroup2"></span> <br>
+                            
+                            <input type="button" id="sbutton3" class="fa fa-search" value="&#xf536;  DE genes of selected cells" onclick="compareSelect()">
+                            <br>
+                            
+							<input type="button" id="springbutton" class="fa fa-search" value="&#xf1fa;SPRING visualizaton" onclick="ShowSpring()">
+							<br>
+							<input type="button" id="cellGene" class="fa fa-search" value="&#xf493; Expression in selected" onclick="exSelect()">
+							<input type="text" name="scellGeneName" id="scellGeneName" value="" onkeydown="if (event.keyCode == 13) {exSelect(); }"><br>
+							<input type="button" id="sbutton3" class="fa fa-search" value="&#xf01e;Clear all selected" onclick="clearSelect()">
+							<br>
+							</li>
+							<li>
+								
+							</li>
+						</div>
+					<!--	  
+					<div class="menu-item" id="tfconfig">
+					  <h4><a href="#">TF CONFIG</a></h4>
+					  <ul>
+						<li><label title="show top ranked 20 regulating TFs (if have) for each edge">Show/Hide TF for each path: <input class="checkbox" id="tfcheck" type="checkbox"  onchange="showhideTF(checked)"> </input></label> </li>
+						<li>
+							<input type="submit" value="Explore TF" onclick="exploretf()">
+							<input type="text" id="tfName" value="" onkeydown="if (event.keyCode == 13) { exploretf() }">
+							</li>
+						<form >
+							<input type="button" value="ColorCellsByGene" onclick="ptest()">
+							<input type="text" name="cellGeneName" id="cellGeneName" value="" ><br>
+							<input type="range" id="geneslider" value="1" min="0" max="10" step=0.1 onchange=setgeneslider(this.value)></input> &nbsp;&nbsp;&nbsp; <span id="cellGeneSlider">1</span> <br>
+							<span id="cellStatus"></span>
+							
+							</form>
+
+					  </ul>
+					</div>
+					-->
+					<div class="menu-item" id="geneconfig">
+					  <h4><a href="#">GENE CONFIG</a></h4>
+					  <ul>
+
+						<li>
+							<input type="submit" class="fa fa-search" value="&#xf493;Gene expression at nodes"  onclick="explorede()">
+							<input type="text" id="deNameNode" value="" onkeydown="if (event.keyCode == 13) { explorede() }">
+							</li>
+						  <li>
+							<input type="submit" class="fa fa-search" value="&#xf493;Gene expression at paths"  onclick="explorede_edges()">
+							<input type="text" id="deNameEdge" value="" onkeydown="if (event.keyCode == 13) { explorede_edges() }">
+							</li>
+
+					  </ul>
+					</div>
+					
+					<div class="menu-item" id="tfconfig">
+					  <h4><a href="#">TF CONFIG</a></h4>
+					  <ul>
+						<li><label><input type="checkbox" id="tfcheck" onchange="showhideTF(checked,id)">Show/hide TFs</label></li>
+						<li><label><input type="checkbox" id="etfcheck" onchange="showhideTF(checked,id)">Show/hide eTFs</label></li>
+						  <li>
+							<input type="submit" class="fa fa-search" value="&#xf493;TF targets' expressions"  onclick="exploretftarget()">
+							<input type="text" id="tfName" value="" onkeydown="if (event.keyCode == 13) { exploretftarget() }">
+						  </li>
+						
+					  </ul>
+					</div>  
+					  
+					<div class="menu-item" id="downloadconfig">
+					  <h4><a href="#">DOWNLOAD</a></h4>
+					  <ul>
+						<li><label><input type="submit" onclick="downloadfig()" class="fa fa-search" value="&#xf019; Generate Figure:"></label></li>
+						<li><a id="downloadlink"></a></li>
+						<li><label><input type="submit" onclick="downloadcell()" class="fa fa-search" value="&#xf019; Download Selected Cells"></label></li>
+						<li><a id="downloadcelllink"></a></li>
+						  <li><label><input type="submit" onclick="downloadtf()" class="fa fa-search" value="&#xf019; Download TFs"></label></li>
+						<li><a id="tfdownloadlink"></a></li>
+						  <li><label><input type="submit" onclick="downloadetf()" class="fa fa-search" value="&#xf019; Download eTFs"></label></li>
+						<li><a id="etfdownloadlink"></a></li>
+						<li><a id="help" href="readme.pdf" class="fa fa-search" value="&xf059"> Readme</a>
+					  </ul>
+					</div>
+				</nav>
+			  </div>
+			  
+			  <div class="gene">
+				  </div>
+		  </div>
+		  <!-- This DIV contains dynamic data-driven svg elements -->
+			<div id="div_svg"> </div>
+			</body>
+	</html>
+	

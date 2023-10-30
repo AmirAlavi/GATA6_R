@@ -1,10 +1,8 @@
 """
 Requires the 'snakemake' conda environment (defined in environment.yml):
 $ conda activate snakemake
-
 Then, to run all analysis and generate all figures, run:
 $ snakemake --cores 1 --use-conda
-
 To generate only a particular result, just specify it, e.g.:
 $ snakemake --cores 1 --use-conda results/figures/hypergeometric_comparisons/Nowotschin_E6.5.png
 """
@@ -44,8 +42,16 @@ rule all:
         "results/figures/hypergeometric_comparisons/Ma.png",
         "results/figures/marker_module_scoring/Xiang_new_annotations_TSNE.png",
         "results/figures/marker_module_scoring/Xiang_new_annotations_UMAP.png",
-        "results/figures/data_integration_and_alignment/Ours_onto_Tyser_UMAP.png",
-        "results/figures/data_integration_and_alignment/Ours_onto_Tyser_transfer_label_distribution.png"
+        "results/figures/data_integration_and_alignment/mmB_D5_onto_Tyser_UMAP.png",
+        "results/figures/data_integration_and_alignment/mmB_D5_onto_Tyser_transfer_label_distribution.png",
+        "results/figures/data_integration_and_alignment/D4_merged_Tyser_UMAP.png",
+        "results/figures/data_integration_and_alignment/D4_merged_Tyser_transfer_label_distribution.png",
+        "results/figures/data_integration_and_alignment/D4_SB431521_Tyser_UMAP.png",
+        "results/figures/data_integration_and_alignment/D4_SB431521_Tyser_transfer_label_distribution.png",
+        "results/figures/data_integration_and_alignment/D5_Tyser_UMAP.png",
+        "results/figures/data_integration_and_alignment/D5_Tyser_transfer_label_distribution.png",
+        "results/figures/data_integration_and_alignment/D7_Tyser_UMAP.png",
+        "results/figures/data_integration_and_alignment/D7_Tyser_transfer_label_distribution.png"
 
 ###############################################################################
 # Data downloading and marker finding
@@ -188,7 +194,8 @@ rule download_tyser_data:
 rule create_tyser_marker_lists:
     input:
         counts="remote_data/Tyser_et_al/express_vals.rds",
-        metadata="remote_data/Tyser_et_al/umap.rds"
+        #metadata="remote_data/Tyser_et_al/umap.rds"
+        metadata="remote_data/Tyser_et_al/tyser_annot_umap.rds"
     output:
         "results/R_objects/Tyser_markers.RDS",
         "results/R_objects/Tyser_seurat_object_processed.RDS"
@@ -298,6 +305,94 @@ rule revision_comparisons:
     script:
         "scripts/hyperg_similarity_xiang_and_tyser_revision.R"
 
+rule aug22_revision_comparison:
+    input:
+        Tyser_seurat_obj = "results/R_objects/Tyser_seurat_object_processed.RDS",
+        Tyser_markers = "results/R_objects/Tyser_markers.RDS",
+        Ma_counts = "remote_data/Ma_et_al/Counts Matrix - GSE130114_MF1453.csv",
+        Ma_markers = "remote_data/Ma_et_al/aax7890-Ma-SM-Table-S6.csv",
+        Nowotschin_E6pt5_seurat_obj = "results/R_objects/Nowotschin_E6.5_seurat_object_processed.RDS",
+        Nowotschin_E4pt5_markers = "data/Nowotschin_et_al/E4.5_markers.csv",
+        Nowotschin_E5pt5_markers = "data/Nowotschin_et_al/E5.5_markers.csv",
+        Nowotschin_E6pt5_markers = "results/R_objects/Nowotschin_E6.5_markers.RDS",
+        Nowotschin_E7pt5_markers = "data/Nowotschin_et_al/E7.5_markers.csv",
+        Sala_markers = "data/Sala_et_al/Sala_markers.csv",
+        Sala_all_genes = "data/Sala_et_al/genes.tsv",
+        Xiang_seurat_obj = "results/R_objects/Xiang_new_annotations_processed_seurat_object.RDS",
+        Xiang_markers = "results/R_objects/Xiang_new_annotations_markers_by_day.RDS",
+        mmBmK_12hr = "data/iDiscoid_Seurat_Objects/mmBmK12hr_033022_processed.RData",
+        mmBmK_36hr = "data/iDiscoid_Seurat_Objects/mmBmK_36hr_03302022_processed.RData",
+        mmBmK_3hr = "data/iDiscoid_Seurat_Objects/mmBmK_3hr_03302022_processed.RData",
+        mmBmK_D0D1 = "data/iDiscoid_Seurat_Objects/mmBmKD0D1_033022_processed.RData",
+        mmBmK_D0D5 = "data/iDiscoid_Seurat_Objects/mmBmKD0D5_033022_processed.RData",
+        mmBmK_D0Ri = "data/iDiscoid_Seurat_Objects/mmBmKD0Ri_033022_processed.RData",
+        mmBmK_D1 = "data/iDiscoid_Seurat_Objects/mmBmKD1_030722_processed.RData",
+        mmBmK_D2 = "data/iDiscoid_Seurat_Objects/mmBmKD2_033022_processed.RData",
+        mmBmK_D3 = "data/iDiscoid_Seurat_Objects/mmBmKD3_03302022_processed_WTsubclustered.RData",
+        mmBmK_D4_combined = "data/iDiscoid_Seurat_Objects/mmBmKD4_combined_processed_WTsubclustered.RData",
+        mmBmK_D5 = "data/iDiscoid_Seurat_Objects/mmBmKD5_033022_processed.RData",
+        mmBmK_D7 = "data/iDiscoid_Seurat_Objects/mmBmKD7_processed.RData",
+        D4_merged = "data/Aug22_revision_seurat_objects/D4_Aug22Revision_combined.RData",
+        D4_SB431542_Aug22Revisions = "data/Aug22_revision_seurat_objects/D4_SB431521_Aug22Revision.RData",
+        D5_20220330_Aug22Revisions = "data/Aug22_revision_seurat_objects/D5_Aug22Revision.RData",
+        D7_20220307_Aug22Revisions = "data/Aug22_revision_seurat_objects/D7_Aug22Revision.RData",
+        FeLO_monoculture_cytokine_minus = "data/Aug22_revision_seurat_objects/FeLO-monoculture-cytokine-minus_03152022.RData",
+        FeLO_monoculture_cytokine_plus = "data/Aug22_revision_seurat_objects/FeLO-monoculture-cytokine-plus_03152022.RData",
+        D8_H1iDiscoid_Aug22Revision = "data/Aug22_revision_seurat_objects/H1iDiscoidD8_033022_Aug22Revision.RData",
+        yolk_sac = "data/Aug22_revision_seurat_objects/Yolk_sac_subclustered.RData"
+    output:
+        outfile = "results/figures/hypergeometric_comparisons/success_aug22rev.txt"
+    conda:
+        "envs/r_seurat_env.yml"
+    script:
+        "scripts/hyperg_similarity_Aug22Revision.R"
+        
+rule fetalLiver_yolksac_comparison:
+    input:
+        "data/fetalLiver_yolksac_comparison_objects/coculture_FeLO_03152022.RData",
+        "data/fetalLiver_yolksac_comparison_objects/FeLO-monoculture-cytokine-minus_03152022.RData",
+        "data/fetalLiver_yolksac_comparison_objects/FeLO-monoculture-cytokine-plus_03152022.RData",                       "data/fetalLiver_yolksac_comparison_objects/Yolk_sac_subclustered.RData",
+        "data/fetalLiver_yolksac_comparison_objects/YolkSacFetalLiver-split days with markers.RData",                     "data/fetalLiver_yolksac_comparison_objects/AdultPlusFetalLiverYolkSac-split days with markers.RData",
+        "data/fetalLiver_yolksac_comparison_objects/ZhaiCynomolgusEmbryoProcessed-split days with markers.RData",
+        "data/fetalLiver_yolksac_comparison_objects/DesLO_D17_4-24-23.rds",
+        "data/fetalLiver_yolksac_comparison_objects/FeLO_D17_JH-04-20-23.rds",
+        "data/fetalLiver_yolksac_comparison_objects/YSFetalLiverFullMetadata-markers.rds",
+        "data/fetalLiver_yolksac_comparison_objects/DesLO_D17_5-03-23-markers.rds",
+        "data/fetalLiver_yolksac_comparison_objects/FeLO_D17_5-03-23-markers.rds"
+    output:
+        "results/figures/hypergeometric_comparisons/success_fetalLiver_yolksac.txt"
+    conda:
+        "envs/r_seurat_env.yml"
+    script:
+        "scripts/hyperg_similarity_fetalLiver_yolkSac_comparison.R"
+        
+rule plot_hypergeom_comparison:
+    input:
+        "results/figures/hypergeometric_comparisons/success_fetalLiver_yolksac.txt",
+        "results/figures/hypergeometric_comparisons/success_aug22rev.txt"
+    output:
+        "results/figures/hypergeometric_comparisons/success_comp_plot.txt"
+    conda:
+        "envs/r_seurat_env.yml"
+    script:
+        "scripts/plot_hypergeom.R"
+
+###############################################################################
+# YSEndo VS DE(P) analysis
+###############################################################################
+rule ysendo_dep_analysis:
+    input:
+        D4_merged = "data/Aug22_revision_seurat_objects/D4_Aug22Revision_combined.RData",
+        mmBmK_D2 = "data/iDiscoid_Seurat_Objects/mmBmKD2_033022_processed.RData",
+        D5_20220330_Aug22Revisions = "data/Aug22_revision_seurat_objects/D5_Aug22Revision.RData",
+        mmBmK_D3 = "data/iDiscoid_Seurat_Objects/mmBmKD3_03302022_processed_WTsubclustered.RData"
+    output:
+        outfile = "results/figures/comparison_idiscoid_to_YSEndo_and_DE/success_ysendo_dep_plot.txt"
+    conda:
+        "envs/r_seurat_env.yml"
+    script:
+        "scripts/comparison_idiscoid_to_YSEndo_and_DE.R"
+
 ###############################################################################
 # Marker "module score" figures
 ###############################################################################
@@ -312,20 +407,114 @@ rule create_module_score_figures:
         "envs/r_seurat_env.yml"
     script:
         "scripts/module_score_figures.R"
-
 ###############################################################################
 # Data integration and alignment figures
 ###############################################################################
-rule integrate_and_align_tyser:
+rule integrate_and_align_mmB_D5_tyser:
     input:
         "results/R_objects/Ours_subclusters_seurat_object.RDS",
         # "results/R_objects/Tyser_markers.RDS",
         "remote_data/Tyser_et_al/express_vals.rds",
-        "remote_data/Tyser_et_al/umap.rds"
+        "remote_data/Tyser_et_al/tyser_annot_umap.rds"
     output:
-        "results/figures/data_integration_and_alignment/Ours_onto_Tyser_UMAP.png",
-        "results/figures/data_integration_and_alignment/Ours_onto_Tyser_transfer_label_distribution.png"
+        "results/figures/data_integration_and_alignment/mmB_D5_onto_Tyser_UMAP.png",
+        "results/figures/data_integration_and_alignment/mmB_D5_onto_Tyser_transfer_label_distribution.png"
     conda:
         "envs/r_seurat_env.yml"
     script:
-        "scripts/alignment_tyser.R"
+        "scripts/alignment_mmB_D5-tyser.R"
+        
+rule integrate_and_align_D4_merged_tyser:
+    input:
+        "data/Aug22_revision_seurat_objects/D4_Aug22Revision_combined.RData",
+        "remote_data/Tyser_et_al/express_vals.rds",
+        "remote_data/Tyser_et_al/tyser_annot_umap.rds"
+    output:
+        "results/figures/data_integration_and_alignment/D4_merged_Tyser_UMAP.png",
+        "results/figures/data_integration_and_alignment/D4_merged_Tyser_transfer_label_distribution.png"
+    conda:
+        "envs/r_seurat_env.yml"
+    script:
+        "scripts/alignment_D4_merged-tyser.R"
+
+rule integrate_and_align_D4_SB431521_Aug22Revision_tyser:
+    input:
+        "data/Aug22_revision_seurat_objects/D4_SB431521_Aug22Revision.RData",
+        "remote_data/Tyser_et_al/express_vals.rds",
+        "remote_data/Tyser_et_al/tyser_annot_umap.rds"
+    output:
+        "results/figures/data_integration_and_alignment/D4_SB431521_Tyser_UMAP.png",
+        "results/figures/data_integration_and_alignment/D4_SB431521_Tyser_transfer_label_distribution.png"
+    conda:
+        "envs/r_seurat_env.yml"
+    script:
+        "scripts/alignment_D4_SB431521-tyser.R"
+
+rule integrate_and_align_D5_tyser:
+    input:
+        "data/Aug22_revision_seurat_objects/D5_Aug22Revision.RData",
+        "remote_data/Tyser_et_al/express_vals.rds",
+        "remote_data/Tyser_et_al/tyser_annot_umap.rds"
+    output:
+        "results/figures/data_integration_and_alignment/D5_Tyser_UMAP.png",
+        "results/figures/data_integration_and_alignment/D5_Tyser_transfer_label_distribution.png"
+    conda:
+        "envs/r_seurat_env.yml"
+    script:
+        "scripts/alignment_D5-tyser.R"
+
+rule integrate_and_align_D7_tyser:
+    input:
+        "data/Aug22_revision_seurat_objects/D7_Aug22Revision.RData",
+        "remote_data/Tyser_et_al/express_vals.rds",
+        "remote_data/Tyser_et_al/tyser_annot_umap.rds"
+    output:
+        "results/figures/data_integration_and_alignment/D7_Tyser_UMAP.png",
+        "results/figures/data_integration_and_alignment/D7_Tyser_transfer_label_distribution.png"
+    conda:
+        "envs/r_seurat_env.yml"
+    script:
+        "scripts/alignment_D7-tyser.R"
+
+###############################################################################
+# Generate expression change plots separately for WT and iGATA6 clusters in D0~D5
+###############################################################################
+rule plot_expression_change_D0_to_D5:
+    input:
+        mmBmK_D0Ri = "data/iDiscoid_Seurat_Objects/mmBmKD0Ri_033022_processed.RData",
+        mmBmK_12hr = "data/iDiscoid_Seurat_Objects/mmBmK12hr_033022_processed.RData",
+        mmBmK_D1 = "data/iDiscoid_Seurat_Objects/mmBmKD1_030722_processed.RData",
+        mmBmK_36hr = "data/iDiscoid_Seurat_Objects/mmBmK_36hr_03302022_processed.RData",
+        mmBmK_D2 = "data/iDiscoid_Seurat_Objects/mmBmKD2_033022_processed.RData",
+        mmBmK_D3 = "data/iDiscoid_Seurat_Objects/mmBmKD3_03302022_processed_WTsubclustered.RData",
+        D4_merged = "data/Aug22_revision_seurat_objects/D4_Aug22Revision_combined.RData",
+        D5_20220330_Aug22Revisions = "data/Aug22_revision_seurat_objects/D5_Aug22Revision.RData"
+    output:
+        WT = "results/figures/expression_change/WT_expression_change.png",
+        GATA6 = "results/figures/expression_change/iGATA6_expression_change.png"
+    conda:
+        "envs/r_seurat_env.yml"
+    script:
+        "scripts/expression_change_D0_to_D5.R"
+
+###############################################################################
+# Generate inputs for scdiff2
+###############################################################################
+rule generate_input_for_scdiff2:
+    input:
+        mmBmK_D0Ri = "data/iDiscoid_Seurat_Objects/mmBmKD0Ri_033022_processed.RData",
+        mmBmK_12hr = "data/iDiscoid_Seurat_Objects/mmBmK12hr_033022_processed.RData",
+        mmBmK_D1 = "data/iDiscoid_Seurat_Objects/mmBmKD1_030722_processed.RData",
+        mmBmK_36hr = "data/iDiscoid_Seurat_Objects/mmBmK_36hr_03302022_processed.RData",
+        mmBmK_D2 = "data/iDiscoid_Seurat_Objects/mmBmKD2_033022_processed.RData",
+        mmBmK_D3 = "data/iDiscoid_Seurat_Objects/mmBmKD3_03302022_processed_WTsubclustered.RData",
+        D4_merged = "data/Aug22_revision_seurat_objects/D4_Aug22Revision_combined.RData",
+        D5_20220330_Aug22Revisions = "data/Aug22_revision_seurat_objects/D5_Aug22Revision.RData",
+        cluster_label = "data/iDiscoid_cluster_assignments/D0_to_D5_Cluster_Assignments.csv"
+    output:
+        scdiff2_out_WT = "results/scdiff2/expression_WT",
+        scdiff2_out_GATA6 = "results/scdiff2/expression_GATA6"
+    conda:
+        "envs/r_seurat_env.yml"
+    script:
+        "scripts/generate_input_for_scdiff2.R"

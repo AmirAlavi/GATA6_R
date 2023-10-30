@@ -11,8 +11,8 @@
 #' @examples h2m_df <- getMouse2HumanGeneMapping(hgnc_genes)
 getMouse2HumanGeneMapping <- function(x) {
   require("biomaRt")
-  human = useMart("ensembl", dataset = "hsapiens_gene_ensembl")
-  mouse = useMart("ensembl", dataset = "mmusculus_gene_ensembl")
+  human = useMart("ensembl", dataset = "hsapiens_gene_ensembl",host = "https://dec2021.archive.ensembl.org/")
+  mouse = useMart("ensembl", dataset = "mmusculus_gene_ensembl",host = "https://dec2021.archive.ensembl.org/")
   
   genesV2 = getLDS(
     attributes = c("mgi_symbol"),
@@ -35,8 +35,8 @@ getMouse2HumanGeneMapping <- function(x) {
 #' @examples m2h_df <- getHuman2MouseGeneMapping(mgi_genes)
 getHuman2MouseGeneMapping <- function(x) {
   require("biomaRt")
-  human = useMart("ensembl", dataset = "hsapiens_gene_ensembl")
-  mouse = useMart("ensembl", dataset = "mmusculus_gene_ensembl")
+  human = useMart("ensembl", dataset = "hsapiens_gene_ensembl",host = "https://dec2021.archive.ensembl.org/")
+  mouse = useMart("ensembl", dataset = "mmusculus_gene_ensembl",host = "https://dec2021.archive.ensembl.org/")
   
   genesV2 = getLDS(
     attributes = c("hgnc_symbol"),

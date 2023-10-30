@@ -39,7 +39,8 @@ tyser <- ScaleData(object = tyser, features = rownames(x = tyser))
 s.genes <- cc.genes$s.genes
 g2m.genes <- cc.genes$g2m.genes
 
-tyser <- CellCycleScoring(object = tyser, s.features = s.genes, g2m.features = g2m.genes, set.ident = TRUE)
+#tyser <- CellCycleScoring(object = tyser, s.features = s.genes, g2m.features = g2m.genes, set.ident = TRUE)
+tyser <- CellCycleScoring(object = tyser, s.features = s.genes, g2m.features = g2m.genes)
 tyser <- ScaleData(object = tyser, vars.to.regress = c("S.Score", "G2M.Score"), features = rownames(x = tyser))
 
 tyser <- RunPCA(object = tyser, features = VariableFeatures(object = tyser), verbose = FALSE)

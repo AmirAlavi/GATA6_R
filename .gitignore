@@ -51,3 +51,12 @@ docs/
 
 # translation temp files
 po/*~
+
+# old results not updated into the repo
+old
+
+# big data files will not be tracked
+data/Aug22_revision_seurat_objects
+data/fetalLiver_yolksac_comparison_objects
+data/iDiscoid_cluster_assignments
+data/iDiscoid_Seurat_Objects
